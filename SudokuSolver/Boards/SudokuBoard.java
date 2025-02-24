@@ -14,4 +14,10 @@ public interface SudokuBoard {
     public boolean isMoveValid(SudokuMove move);
     public void makeMove(SudokuMove move);
     public void undoMove(SudokuMove move);
+
+    public int getWidth();
+    public int getHeight();
+    public int getBoxWidth();
+    public int getBoxHeight();
+
 } 

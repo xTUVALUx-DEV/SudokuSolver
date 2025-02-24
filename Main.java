@@ -4,11 +4,14 @@ import java.util.LinkedList;
 
 import SudokuSolver.Boards.DefaultBoard;
 import SudokuSolver.Boards.SudokuBoard;
+import SudokuSolver.Boards.SudokuMove;
 import SudokuSolver.BruteForceSolver.BruteForceSolver;
 import SudokuSolver.JsonReader.JsonArrayComponent;
 import SudokuSolver.JsonReader.JsonComponent;
 import SudokuSolver.JsonReader.JsonMapComponent;
 import SudokuSolver.JsonReader.JsonReader;
+import SudokuSolver.SmartSolver.OptionBoard;
+import SudokuSolver.SmartSolver.SmartSolver;
 
 class Main {
   public static void main(String[] args) throws IOException {
@@ -18,8 +21,14 @@ class Main {
     
     SudokuBoard board = new DefaultBoard(json);
     System.out.println(board);
-    BruteForceSolver solver = new BruteForceSolver();
+    
+    SmartSolver solver = new SmartSolver();
     solver.solve(board);
+
+    // System.out.println("["+optionBoard.getOptionsReadable(0, 0) + "]");
+
+    //BruteForceSolver solver = new BruteForceSolver();
+    //solver.solve(board);
     //solver.test();
 
     System.out.println(board);

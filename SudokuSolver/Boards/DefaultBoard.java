@@ -177,4 +177,23 @@ public class DefaultBoard implements SudokuBoard {
         return new DefaultBoard(newBoard, boxWidth, boxHeight);
     }
 
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getBoxWidth() {
+        return boxWidth;
+    }
+
+    @Override
+    public int getBoxHeight() {
+        return boxHeight;
+    }
 }

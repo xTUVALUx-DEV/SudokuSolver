@@ -10,4 +10,17 @@ public class SudokuMove {
         this.col = col;
         this.value = value;
     }
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + row + ", " + col + ", " + value + ")";
+    }
 }
