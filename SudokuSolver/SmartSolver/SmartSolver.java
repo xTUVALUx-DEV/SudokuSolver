@@ -13,7 +13,7 @@ import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.SudokuMove;
 
 public class SmartSolver {
-
+     
      public SudokuBoard solve(SudokuBoard board) {
           System.out.println("Solving with SmartSolver...");
           long startTime = System.currentTimeMillis();
@@ -41,9 +41,18 @@ public class SmartSolver {
           }
 
           LinkedList<SudokuMove> moves = board.getPossibleMoves();
-          SudokuMove[] sortedMoves = optionBoard.sortMoves(moves);
-
+          OptionsMoveWrapper[] sortedMoves = optionBoard.sortMoves(moves);
           
+          if (sortedMoves.length == 0) {
+               return null;
+          }
+
+          if (sortedMoves[0].getOptionCount() == 1) {  // FIX-ME
+               // If there is only one option, make the move and continue
+               sortedMoves = new OptionsMoveWrapper[] {sortedMoves[0]};
+               
+               return solveStepSinglethreaded(board, optionBoard, threadStopFlag, sortedMoves, threadedDepth);
+          }
 
           if (threadedDepth <= 0) 
                return solveStepSinglethreaded(board, optionBoard, threadStopFlag, sortedMoves, threadedDepth);
@@ -52,10 +61,11 @@ public class SmartSolver {
 
      }
 
-     public SudokuBoard solveStepSinglethreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, SudokuMove[] moves, int depth) {
-          for (SudokuMove move : moves) {
+     public SudokuBoard solveStepSinglethreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
+          for (OptionsMoveWrapper optionMove : moves) {
                if (threadStopFlag.get()) return null; 
 
+               SudokuMove move = optionMove.getMove();
                board.makeMove(move);
                
                OptionBoardMove optMove = optionBoard.makeMove(move);
@@ -71,15 +81,17 @@ public class SmartSolver {
           return null;
      }
 
-     public SudokuBoard solveStepMultithreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, SudokuMove[] moves, int depth) {
+     public SudokuBoard solveStepMultithreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
           List<SudokuBoard> results = new ArrayList<>();
 
           ForkJoinPool forkJoinPool = null;
           try {
                forkJoinPool = new ForkJoinPool(10); // Always use 10 threads
                     results = forkJoinPool.submit(() ->
-                         Stream.of(moves).parallel().map(move -> {
+                         Stream.of(moves).parallel().map(optionsMove -> {
                               if (threadStopFlag.get()) return null;  // Solution found in another thread
+
+                              SudokuMove move = optionsMove.getMove();
 
                               // Copy the board and make the move without affecting other threads
                               SudokuBoard newBoard = board.copy();

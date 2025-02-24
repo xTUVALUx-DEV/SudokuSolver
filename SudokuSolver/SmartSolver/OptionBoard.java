@@ -84,14 +84,19 @@ public class OptionBoard {
         return new OptionBoardMove(changes);
     }
 
-    public SudokuMove[] sortMoves(LinkedList<SudokuMove> moves) {
+    public OptionsMoveWrapper[] sortMoves(LinkedList<SudokuMove> moves) {
         // Sort the moves based on the number of options using counting-sort
+        // If a forced move is found only the forced move is returned.
         
         int[] moveOptions = new int[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
             moveOptions[i] = 0;
             for (int j = 0; j < options.length; j++) {
                 moveOptions[i] += options[moves.get(i).row][moves.get(i).col][j];
+            }
+
+            if (moveOptions[i] == 1) {
+                return new OptionsMoveWrapper[] {new OptionsMoveWrapper(moves.get(i), 1)};
             }
         }
 
@@ -100,16 +105,16 @@ public class OptionBoard {
             counts[moveOptions[i]]++;
         }
 
-        SudokuMove[] sortedMoves = new SudokuMove[moves.size()];
+        OptionsMoveWrapper[] sortedMoves = new OptionsMoveWrapper[moves.size()];
         for (int i = 1; i < counts.length; i++) {
             counts[i] += counts[i - 1];
         }
 
         for (int i = moves.size() - 1; i >= 0; i--) {
-            sortedMoves[counts[moveOptions[i]] - 1] = moves.get(i);
+            sortedMoves[counts[moveOptions[i]] - 1] = new OptionsMoveWrapper(moves.get(i), moveOptions[i]);
             counts[moveOptions[i]]--;
         }
-
+        
         return sortedMoves;
 
     }
@@ -135,6 +140,28 @@ public class OptionBoard {
         }
         return new OptionBoard(newOptions, boxWidth, boxHeight);
         
+    }
+
+    public int getOptionCount(int row, int col) {
+        int count = 0;
+        for (int i = 0; i < options[row][col].length; i++) {
+            count += options[row][col][i];
+        }
+        return count;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < options.length; i++) {
+            for (int j = 0; j < options[0].length; j++) {
+                builder.append(getOptionCount(j, i));
+                builder.append(" ");
+            }
+            builder.append("\n");
+        }
+
+        return builder.toString();
     }
     
 }
