@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import SudokuSolver.Boards.DefaultBoard;
 import SudokuSolver.Boards.SudokuBoard;
+import SudokuSolver.BruteForceSolver.BruteForceSolver;
 import SudokuSolver.JsonReader.JsonArrayComponent;
 import SudokuSolver.JsonReader.JsonComponent;
 import SudokuSolver.JsonReader.JsonMapComponent;
@@ -16,6 +17,10 @@ class Main {
     JsonMapComponent json = (JsonMapComponent) reader.readJson();
     
     SudokuBoard board = new DefaultBoard(json);
+    System.out.println(board);
+    BruteForceSolver solver = new BruteForceSolver();
+    solver.solve(board);
+    //solver.test();
 
     System.out.println(board);
 

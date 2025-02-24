@@ -1,4 +1,4 @@
-package SudokuSolver.BruteForceSolver;
+package SudokuSolver.SmartSolver;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -9,9 +9,9 @@ import java.util.stream.Collectors;
 import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.SudokuMove;
 
-public class BruteForceSolver {
+public class SmartSolver {
 
-     public BruteForceSolver() {
+     public SmartSolver() {
      }
 
      public LinkedList<SudokuMove> sortMoves(LinkedList<SudokuMove> moves, SudokuBoard board) {
@@ -35,7 +35,7 @@ public class BruteForceSolver {
      public SudokuBoard solve(SudokuBoard board) {
           AtomicBoolean threadStopFlag = new AtomicBoolean(false);
 
-          SudokuBoard newBoard = solve(board, threadStopFlag, 3);
+          SudokuBoard newBoard = solve(board, threadStopFlag, 0);
           if (!newBoard.isSolved()) {
                System.out.println("Failed to solve!");
                return null;
@@ -82,7 +82,9 @@ public class BruteForceSolver {
      }
 
      public SudokuBoard solveStepMultithreaded(SudokuBoard board, AtomicBoolean threadStopFlag, LinkedList<SudokuMove> moves, int depth) {
-          
+          if(1==1) 
+               throw new RuntimeException("Not implemented");
+
           List<SudokuBoard> results = moves.parallelStream().map(move -> {
                if (threadStopFlag.get()) return null; 
                SudokuBoard newBoard = board.copy();
@@ -105,9 +107,4 @@ public class BruteForceSolver {
           
      }
 
-     public void test(SudokuBoard board) {
-          board.isMoveValid(new SudokuMove(8, 4, 100));
-          board.printBoard();
-          //System.out.println(board.getPossibleMoves());
-     }
 }

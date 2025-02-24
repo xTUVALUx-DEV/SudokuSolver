@@ -5,7 +5,7 @@ public class SudokuMove {
     public int col;
     public int value;
 
-    SudokuMove(int row, int col, int value) {
+    public SudokuMove(int row, int col, int value) {
         this.row = row;
         this.col = col;
         this.value = value;

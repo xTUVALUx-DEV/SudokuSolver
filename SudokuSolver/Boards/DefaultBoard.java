@@ -13,6 +13,7 @@ public class DefaultBoard implements SudokuBoard {
     private int height;
     private int boxWidth;
     private int boxHeight;
+    private int lastValidMoveCount = 0;
 
     public DefaultBoard(int width, int height, int boxWidth, int boxHeight) {
         board = new int[width][height];
@@ -44,8 +45,12 @@ public class DefaultBoard implements SudokuBoard {
         
     }
 
-    public DefaultBoard(int[][] board) {
+    public DefaultBoard(int[][] board, int boxWidth, int boxHeight) {
         this.board = board;
+        this.width = board.length;
+        this.height = board[0].length;
+        this.boxWidth = boxWidth;
+        this.boxHeight = boxHeight;
     }
 
     @Override
@@ -66,6 +71,7 @@ public class DefaultBoard implements SudokuBoard {
             }
             System.out.println();
         }
+        System.out.println("Last Valid Move Count: " + lastValidMoveCount);
     }
 
     @Override
@@ -92,15 +98,22 @@ public class DefaultBoard implements SudokuBoard {
                 return false;
             }
         }
-        int boxRow = move.row / boxHeight;
-        int boxCol = move.col / boxWidth;
-        for(int i = boxRow * boxHeight; i < boxRow * boxHeight + 3; i++) {  // Todo: Test this
-            for(int j = boxCol * 3; boxWidth < boxCol * boxWidth + 3; j++) {
-                if(board[i][j] == move.value) {
+        
+        // Get the top left corner of the box that the move is in
+        int moveRow = move.row;
+        int moveCol = move.col;
+
+        int moveBoxRow = moveRow / boxHeight;
+        int moveBoxCol = moveCol / boxWidth;
+        
+        for (int i = moveBoxRow * boxHeight; i < (moveBoxRow + 1) * boxHeight; i++) {
+            for (int j = moveBoxCol * boxWidth; j < (moveBoxCol + 1) * boxWidth; j++) {
+                if (board[i][j] == move.value) {
                     return false;
                 }
             }
         }
+
 
         return true;
     }
@@ -123,6 +136,7 @@ public class DefaultBoard implements SudokuBoard {
                 }
             }
         }
+        lastValidMoveCount = moves.size();
 
         return moves;
     }
@@ -143,12 +157,24 @@ public class DefaultBoard implements SudokuBoard {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                builder.append(board[i][j]);
+                builder.append(board[i][j] == 0 ? " " : board[i][j]);
                 builder.append(" ");
             }
             builder.append("\n");
         }
-        
+
         return builder.toString();
     }
+
+    @Override
+    public SudokuBoard copy() {
+        int[][] newBoard = new int[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                newBoard[i][j] = board[i][j];
+            }
+        }
+        return new DefaultBoard(newBoard, boxWidth, boxHeight);
+    }
+
 }
