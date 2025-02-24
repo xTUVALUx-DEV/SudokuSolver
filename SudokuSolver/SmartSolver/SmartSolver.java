@@ -47,7 +47,7 @@ public class SmartSolver {
                return null;
           }
 
-          if (sortedMoves[0].getOptionCount() == 1) {  // FIX-ME
+          if (sortedMoves[0].getOptionCount() == 1) { 
                // If there is only one option, make the move and continue
                sortedMoves = new OptionsMoveWrapper[] {sortedMoves[0]};
                
