@@ -3,10 +3,12 @@ import java.io.IOException;
 
 import SudokuSolver.Boards.DefaultBoard;
 import SudokuSolver.Boards.SudokuBoard;
+import SudokuSolver.Boards.SudokuMove;
 import SudokuSolver.Boards.ThermoSudokuBoard;
 import SudokuSolver.JsonReader.JsonMapComponent;
 import SudokuSolver.JsonReader.JsonReader;
 import SudokuSolver.SmartSolver.GenericSmartSolver;
+import SudokuSolver.SmartSolver.SmartSolverConfig;
 
 class Main {
   public static void main(String[] args) throws IOException {
@@ -14,11 +16,9 @@ class Main {
     JsonReader reader = new JsonReader(new File("thermo.json"));
     JsonMapComponent json = (JsonMapComponent) reader.readJson();
     
-    SudokuBoard board = new ThermoSudokuBoard(json);
-    System.out.println(board);
+    SudokuBoard board = new DefaultBoard(json);
     
-    GenericSmartSolver solver = new GenericSmartSolver();
-
+    GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(1, true, 2));
 
     solver.solve(board);
 

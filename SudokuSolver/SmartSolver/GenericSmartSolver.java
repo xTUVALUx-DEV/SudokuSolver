@@ -33,7 +33,7 @@ public class GenericSmartSolver {
           OptionBoard optionBoard = new OptionBoard(board);  // To keep track of possible moves
 
           SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, config.getThreadedDepth());
-          if (!newBoard.isSolved()) {
+          if (newBoard == null || !newBoard.isSolved()) {
                System.out.println("Failed to solve!");
                return null;
           }
@@ -48,7 +48,7 @@ public class GenericSmartSolver {
           // Solves a generic sudoku board using a smart brute force algorithm which always picks the move with the least possible options
           // May have hash collisions if a transposition table is used
           // Uses multithreading to solve the board faster
-          // 63-120ms for the test board
+          // ~30ms for the test board
 
 
           if (board.isSolved()) {
@@ -82,6 +82,7 @@ public class GenericSmartSolver {
 
                SudokuMove move = optionMove.getMove();
                board.makeMove(move);
+               
                if (config.getUseTranspositionTable() && TranspositionTable.checkOrAdd(board)) {
                     board.undoMove(move);
                     return null;
@@ -105,7 +106,7 @@ public class GenericSmartSolver {
 
           ForkJoinPool forkJoinPool = null;
           try {
-               forkJoinPool = new ForkJoinPool(10); // Always use 10 threads
+               forkJoinPool = new ForkJoinPool(config.getMaxThreadCount()); // Always use 10 threads
                     results = forkJoinPool.submit(() ->
                          Stream.of(moves).parallel().map(optionsMove -> {
                               if (threadStopFlag.get()) return null;  // Solution found in another thread

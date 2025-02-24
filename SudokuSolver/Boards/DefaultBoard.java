@@ -88,6 +88,7 @@ public class DefaultBoard implements SudokuBoard {
     }
 
     public boolean isMoveValid(SudokuMove move) {
+
         for(int i = 0; i < width; i++) {
             if(board[move.row][i] == move.value) {
                 return false;
