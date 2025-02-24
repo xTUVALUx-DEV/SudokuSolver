@@ -8,12 +8,12 @@ import SudokuSolver.JsonReader.JsonMapComponent;
 import SudokuSolver.JsonReader.JsonNumberComponent;
 
 public class DefaultBoard implements SudokuBoard {
-    private int[][] board;
-    private int width;
-    private int height;
-    private int boxWidth;
-    private int boxHeight;
-    private int lastValidMoveCount = 0;
+    protected int[][] board;
+    protected int width;
+    protected int height;
+    protected int boxWidth;
+    protected int boxHeight;
+    protected int lastValidMoveCount = 0;
 
     public DefaultBoard(int width, int height, int boxWidth, int boxHeight) {
         board = new int[width][height];
@@ -175,6 +175,17 @@ public class DefaultBoard implements SudokuBoard {
             }
         }
         return new DefaultBoard(newBoard, boxWidth, boxHeight);
+    }
+
+    @Override
+    public long getHash() {
+        long hash = 0;
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                hash = hash * 31 + board[i][j];
+            }
+        }
+        return hash;
     }
 
     @Override

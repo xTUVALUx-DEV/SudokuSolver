@@ -149,7 +149,7 @@ public class OptionBoard {
         }
         return count;
     }
-
+    
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

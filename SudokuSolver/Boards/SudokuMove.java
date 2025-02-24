@@ -19,6 +19,10 @@ public class SudokuMove {
         return col;
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public String toString() {
         return "(" + row + ", " + col + ", " + value + ")";

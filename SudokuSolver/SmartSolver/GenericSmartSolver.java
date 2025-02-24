@@ -12,8 +12,19 @@ import java.util.stream.Stream;
 import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.SudokuMove;
 
-public class SmartSolver {
+public class GenericSmartSolver {
      
+     static TranspositionTable transpositionTable = new TranspositionTable();
+     SmartSolverConfig config;
+
+     public GenericSmartSolver() {
+          this(new SmartSolverConfig());
+     }
+
+     public GenericSmartSolver(SmartSolverConfig config) {
+          this.config = config;
+     }
+
      public SudokuBoard solve(SudokuBoard board) {
           System.out.println("Solving with SmartSolver...");
           long startTime = System.currentTimeMillis();
@@ -21,7 +32,7 @@ public class SmartSolver {
           AtomicBoolean threadStopFlag = new AtomicBoolean(false);  // To stop all the threads once a solution is found
           OptionBoard optionBoard = new OptionBoard(board);  // To keep track of possible moves
 
-          SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, 2);
+          SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, config.getThreadedDepth());
           if (!newBoard.isSolved()) {
                System.out.println("Failed to solve!");
                return null;
@@ -32,10 +43,14 @@ public class SmartSolver {
           return newBoard;
 
      }
-     
+
      public SudokuBoard solve(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, int threadedDepth) {
           // Solves a generic sudoku board using a smart brute force algorithm which always picks the move with the least possible options
-          
+          // May have hash collisions if a transposition table is used
+          // Uses multithreading to solve the board faster
+          // 63-120ms for the test board
+
+
           if (board.isSolved()) {
                return board;
           }
@@ -63,11 +78,15 @@ public class SmartSolver {
 
      public SudokuBoard solveStepSinglethreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
           for (OptionsMoveWrapper optionMove : moves) {
-               if (threadStopFlag.get()) return null; 
+               if (threadStopFlag.get()) return null;
 
                SudokuMove move = optionMove.getMove();
                board.makeMove(move);
-               
+               if (config.getUseTranspositionTable() && TranspositionTable.checkOrAdd(board)) {
+                    board.undoMove(move);
+                    return null;
+               }
+
                OptionBoardMove optMove = optionBoard.makeMove(move);
                
                SudokuBoard solvedBoard = solve(board, optionBoard, threadStopFlag, depth);
@@ -98,6 +117,8 @@ public class SmartSolver {
                               OptionBoard newOptionBoard = optionBoard.copy();
                               newOptionBoard.makeMove(move);
                               newBoard.makeMove(move);
+
+                              if (config.getUseTranspositionTable() && TranspositionTable.checkOrAdd(newBoard)) return null;
 
                               SudokuBoard solvedBoard = solve(newBoard, newOptionBoard, threadStopFlag, depth);
                               if (solvedBoard != null) {

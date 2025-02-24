@@ -20,4 +20,5 @@ public interface SudokuBoard {
     public int getBoxWidth();
     public int getBoxHeight();
 
+    public long getHash();
 } 
