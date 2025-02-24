@@ -3,6 +3,8 @@ package SudokuSolver.SmartSolver;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -13,26 +15,28 @@ import SudokuSolver.Boards.SudokuMove;
 public class SmartSolver {
 
      public SudokuBoard solve(SudokuBoard board) {
-          AtomicBoolean threadStopFlag = new AtomicBoolean(false);
-          OptionBoard optionBoard = new OptionBoard(board);
+          System.out.println("Solving with SmartSolver...");
+          long startTime = System.currentTimeMillis();
 
-          SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, 0);
+          AtomicBoolean threadStopFlag = new AtomicBoolean(false);  // To stop all the threads once a solution is found
+          OptionBoard optionBoard = new OptionBoard(board);  // To keep track of possible moves
+
+          SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, 2);
           if (!newBoard.isSolved()) {
                System.out.println("Failed to solve!");
                return null;
           }
-          System.out.println("Solved!");
-          System.out.println(board);
+          System.out.printf("Solved in %dms!%n", System.currentTimeMillis() - startTime);
+          System.out.println(newBoard);
 
           return newBoard;
 
      }
      
      public SudokuBoard solve(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, int threadedDepth) {
-          // Solves a generic sudoku board using a smart brute force algorithm
+          // Solves a generic sudoku board using a smart brute force algorithm which always picks the move with the least possible options
           
           if (board.isSolved()) {
-               System.out.println("Solved!");
                return board;
           }
 
@@ -53,13 +57,6 @@ public class SmartSolver {
                if (threadStopFlag.get()) return null; 
 
                board.makeMove(move);
-               // Print board and wait for a second
-               //System.out.println(board);
-               //try {
-               //     Thread.sleep(200);
-               //} catch (InterruptedException e) {
-               //     e.printStackTrace();
-               //}
                
                OptionBoardMove optMove = optionBoard.makeMove(move);
                
@@ -75,21 +72,39 @@ public class SmartSolver {
      }
 
      public SudokuBoard solveStepMultithreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, SudokuMove[] moves, int depth) {
-          
-          List<SudokuBoard> results = Stream.of(moves).parallel().map(move -> {
-               if (threadStopFlag.get()) return null; 
-               SudokuBoard newBoard = board.copy();
-               OptionBoard newOptionBoard = optionBoard.copy();
-               newOptionBoard.makeMove(move);
-               newBoard.makeMove(move);
-               SudokuBoard solvedBoard = solve(newBoard, newOptionBoard, threadStopFlag, depth);
-               if (solvedBoard != null) {
-                    threadStopFlag.set(true); // Stop all other threads
-                    return solvedBoard;
+          List<SudokuBoard> results = new ArrayList<>();
+
+          ForkJoinPool forkJoinPool = null;
+          try {
+               forkJoinPool = new ForkJoinPool(10); // Always use 10 threads
+                    results = forkJoinPool.submit(() ->
+                         Stream.of(moves).parallel().map(move -> {
+                              if (threadStopFlag.get()) return null;  // Solution found in another thread
+
+                              // Copy the board and make the move without affecting other threads
+                              SudokuBoard newBoard = board.copy();
+                              OptionBoard newOptionBoard = optionBoard.copy();
+                              newOptionBoard.makeMove(move);
+                              newBoard.makeMove(move);
+
+                              SudokuBoard solvedBoard = solve(newBoard, newOptionBoard, threadStopFlag, depth);
+                              if (solvedBoard != null) {
+                                   threadStopFlag.set(true); // Stop all other threads
+                                   return solvedBoard;
+                              }
+                              return null;
+                         }).collect(Collectors.toList())
+               ).get();
+               
+          } catch (InterruptedException | ExecutionException e) {
+               throw new RuntimeException(e);
+          } finally {
+               if (forkJoinPool != null) {
+                    forkJoinPool.shutdown();
+                    forkJoinPool.close();
                }
-               return null;
-          }).collect(Collectors.toList());
-          
+          }
+
           for (SudokuBoard result : results) {
                if (result != null) {
                     return result;

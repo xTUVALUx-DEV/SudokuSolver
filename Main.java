@@ -31,7 +31,6 @@ class Main {
     //solver.solve(board);
     //solver.test();
 
-    System.out.println(board);
 
   }
 }
