@@ -1,6 +1,5 @@
 package SudokuSolver.BruteForceSolver;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -103,11 +102,5 @@ public class BruteForceSolver {
           }
           return null;
           
-     }
-
-     public void test(SudokuBoard board) {
-          board.isMoveValid(new SudokuMove(8, 4, 100));
-          board.printBoard();
-          //System.out.println(board.getPossibleMoves());
      }
 }

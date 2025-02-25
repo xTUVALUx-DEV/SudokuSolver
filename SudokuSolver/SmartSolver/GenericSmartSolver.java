@@ -31,6 +31,8 @@ public class GenericSmartSolver {
 
           AtomicBoolean threadStopFlag = new AtomicBoolean(false);  // To stop all the threads once a solution is found
           OptionBoard optionBoard = new OptionBoard(board);  // To keep track of possible moves
+          // TODO: Use other optionboard for thermo sudoku
+
 
           SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, config.getThreadedDepth());
           if (newBoard == null || !newBoard.isSolved()) {
@@ -48,7 +50,7 @@ public class GenericSmartSolver {
           // Solves a generic sudoku board using a smart brute force algorithm which always picks the move with the least possible options
           // May have hash collisions if a transposition table is used
           // Uses multithreading to solve the board faster
-          // ~30ms for the test board
+          // ~20ms for the test board
 
 
           if (board.isSolved()) {
