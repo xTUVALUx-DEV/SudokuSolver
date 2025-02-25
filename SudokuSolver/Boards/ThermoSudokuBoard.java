@@ -135,4 +135,8 @@ public class ThermoSudokuBoard extends DefaultBoard {
         }
         return newBoard;
     }
+
+    public ArrayList<LinkedList<int[]>> getPaths() {
+        return paths;
+    }
 }

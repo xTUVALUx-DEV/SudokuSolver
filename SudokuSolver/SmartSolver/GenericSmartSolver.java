@@ -11,6 +11,9 @@ import java.util.stream.Stream;
 
 import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.SudokuMove;
+import SudokuSolver.Boards.ThermoSudokuBoard;
+import SudokuSolver.SmartSolver.OptionBoards.DefaultOptionBoard;
+import SudokuSolver.SmartSolver.OptionBoards.ThermoOptionBoard;
 
 public class GenericSmartSolver {
      
@@ -30,9 +33,12 @@ public class GenericSmartSolver {
           long startTime = System.currentTimeMillis();
 
           AtomicBoolean threadStopFlag = new AtomicBoolean(false);  // To stop all the threads once a solution is found
-          OptionBoard optionBoard = new OptionBoard(board);  // To keep track of possible moves
-          // TODO: Use other optionboard for thermo sudoku
 
+          DefaultOptionBoard optionBoard = new DefaultOptionBoard(board);  // To keep track of possible moves
+
+          if (board instanceof ThermoSudokuBoard) {
+               optionBoard = new ThermoOptionBoard((ThermoSudokuBoard) board);
+          }
 
           SudokuBoard newBoard = solve(board, optionBoard, threadStopFlag, config.getThreadedDepth());
           if (newBoard == null || !newBoard.isSolved()) {
@@ -46,7 +52,7 @@ public class GenericSmartSolver {
 
      }
 
-     public SudokuBoard solve(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, int threadedDepth) {
+     public SudokuBoard solve(SudokuBoard board, DefaultOptionBoard optionBoard, AtomicBoolean threadStopFlag, int threadedDepth) {
           // Solves a generic sudoku board using a smart brute force algorithm which always picks the move with the least possible options
           // May have hash collisions if a transposition table is used
           // Uses multithreading to solve the board faster
@@ -78,7 +84,7 @@ public class GenericSmartSolver {
 
      }
 
-     public SudokuBoard solveStepSinglethreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
+     public SudokuBoard solveStepSinglethreaded(SudokuBoard board, DefaultOptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
           for (OptionsMoveWrapper optionMove : moves) {
                if (threadStopFlag.get()) return null;
 
@@ -103,7 +109,7 @@ public class GenericSmartSolver {
           return null;
      }
 
-     public SudokuBoard solveStepMultithreaded(SudokuBoard board, OptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
+     public SudokuBoard solveStepMultithreaded(SudokuBoard board, DefaultOptionBoard optionBoard, AtomicBoolean threadStopFlag, OptionsMoveWrapper[] moves, int depth) {
           List<SudokuBoard> results = new ArrayList<>();
 
           ForkJoinPool forkJoinPool = null;
@@ -117,7 +123,7 @@ public class GenericSmartSolver {
 
                               // Copy the board and make the move without affecting other threads
                               SudokuBoard newBoard = board.copy();
-                              OptionBoard newOptionBoard = optionBoard.copy();
+                              DefaultOptionBoard newOptionBoard = optionBoard.copy();
                               newOptionBoard.makeMove(move);
                               newBoard.makeMove(move);
 

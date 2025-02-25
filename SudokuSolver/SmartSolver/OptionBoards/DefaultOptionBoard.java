@@ -1,22 +1,24 @@
-package SudokuSolver.SmartSolver;
+package SudokuSolver.SmartSolver.OptionBoards;
 
 import java.util.LinkedList;
 
 import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.SudokuMove;
+import SudokuSolver.SmartSolver.OptionBoardMove;
+import SudokuSolver.SmartSolver.OptionsMoveWrapper;
 
-public class OptionBoard {
-    private int[][][] options;
-    private int boxWidth;
-    private int boxHeight;
+public class DefaultOptionBoard {
+    protected int[][][] options;
+    protected int boxWidth;
+    protected int boxHeight;
 
-    public OptionBoard(int[][][] options, int boxWidth, int boxHeight) {
+    public DefaultOptionBoard(int[][][] options, int boxWidth, int boxHeight) {
         this.options = options;
         this.boxWidth = boxWidth;
         this.boxHeight = boxHeight;
     }
 
-    public OptionBoard(SudokuBoard board) {
+    public DefaultOptionBoard(SudokuBoard board) {
         boxWidth = board.getBoxWidth();
         boxHeight = board.getBoxHeight();
         options = new int[board.getWidth()][board.getHeight()][board.getWidth()];
@@ -129,7 +131,7 @@ public class OptionBoard {
         }        
     }
 
-    public OptionBoard copy() {
+    public DefaultOptionBoard copy() {
         int[][][] newOptions = new int[options.length][options[0].length][options[0][0].length];
         for (int i = 0; i < options.length; i++) {
             for (int j = 0; j < options[0].length; j++) {
@@ -138,7 +140,7 @@ public class OptionBoard {
                 }
             }
         }
-        return new OptionBoard(newOptions, boxWidth, boxHeight);
+        return new DefaultOptionBoard(newOptions, boxWidth, boxHeight);
         
     }
 

@@ -6,7 +6,7 @@ public class OptionsMoveWrapper {
     public SudokuMove move;
     public int optionCount;
     
-    OptionsMoveWrapper(SudokuMove move, int optionCount) {
+    public OptionsMoveWrapper(SudokuMove move, int optionCount) {
         this.move = move;
         this.optionCount = optionCount;
     }
