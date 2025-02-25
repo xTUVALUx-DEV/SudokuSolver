@@ -3,6 +3,7 @@ package SudokuSolver.SmartSolver.OptionBoards;
 import java.util.LinkedList;
 
 import SudokuSolver.Boards.SudokuBoard;
+import SudokuSolver.Boards.SudokuMove;
 import SudokuSolver.Boards.ThermoSudokuBoard;
 import SudokuSolver.SmartSolver.OptionBoardMove;
 
@@ -16,8 +17,6 @@ public class ThermoOptionBoard extends DefaultOptionBoard {
 
     @Override
     public OptionBoardMove setValue(int row, int col, int value) {
-
-
         // Default implementation
         LinkedList<int[]> changes = new LinkedList<>();
 
@@ -49,35 +48,49 @@ public class ThermoOptionBoard extends DefaultOptionBoard {
             for (int j = 0; j < path.size(); j++) {
                 int[] ccell = path.get(j);
                 if (ccell[0] == row && ccell[1] == col) {
-                    for (int k = 0; k < path.size(); k++) {
-                        if (k == j) { continue; }
-                        if (k < j) {
-                            for(int v = 0; v < value; v++) {
-                                int[] rowCol = path.get(k);
+                    if (value <= j) {
+                        return new OptionBoardMove(changes);
+                    }
 
-                                if(options[rowCol[0]][rowCol[1]][v] == 1) {
-                                    changes.add(new int[] {rowCol[0], rowCol[1], v});
-                                }
-                                options[rowCol[0]][rowCol[1]][v] = 0;
-                            }
-                        }
-                        else if (k > j) {
-                            for(int v = 0; v > value; v++) {
-                                int[] rowCol = path.get(k);
-
-                                if(options[rowCol[0]][rowCol[1]][v] == 1) {
-                                    changes.add(new int[] {rowCol[0], rowCol[1], v});
-                                }
-                                options[rowCol[0]][rowCol[1]][v] = 0;
-                            }
+                    // Check if the value is greater that ALL previous cells and less than the next cells
+                    if (j > 0) {
+                        int[] pcell = path.get(j - 1);
+                        if (options[pcell[0]][pcell[1]][value - 1] == 1) {
+                            changes.add(new int[] {pcell[0], pcell[1], value - 1});
+                            options[pcell[0]][pcell[1]][value - 1] = 0;
                         }
                     }
 
-                    break;
+                    if (j < path.size() - 1) {
+                        int[] ncell = path.get(j + 1);
+                        if (options[ncell[0]][ncell[1]][value - 1] == 1) {
+                            changes.add(new int[] {ncell[0], ncell[1], value - 1});
+                            options[ncell[0]][ncell[1]][value - 1] = 0;
+                        }
+                    }   
                 }
             }
         }
-
         return new OptionBoardMove(changes);
+    }
+
+    @Override
+    public OptionBoardMove makeMove(SudokuMove move) {
+        return setValue(move.row, move.col, move.value);
+    }
+
+    @Override
+    public DefaultOptionBoard copy() {
+        ThermoOptionBoard newBoard = new ThermoOptionBoard(board);
+        int[][][] newOptions = new int[options.length][options[0].length][options[0][0].length];
+        for (int i = 0; i < options.length; i++) {
+            for (int j = 0; j < options[0].length; j++) {
+                for (int k = 0; k < options[0][0].length; k++) {
+                    newOptions[i][j][k] = options[i][j][k];
+                }
+            }
+        }
+        newBoard.options = newOptions;
+        return newBoard;
     }
 }
