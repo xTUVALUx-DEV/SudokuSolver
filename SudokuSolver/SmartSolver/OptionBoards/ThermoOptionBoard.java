@@ -48,26 +48,30 @@ public class ThermoOptionBoard extends DefaultOptionBoard {
             for (int j = 0; j < path.size(); j++) {
                 int[] ccell = path.get(j);
                 if (ccell[0] == row && ccell[1] == col) {
-                    if (value <= j) {
-                        return new OptionBoardMove(changes);
-                    }
+                    for (int k = 0; k < path.size(); k++) {
+                        if (k == j) { continue; }
+                        if (k > j) {
+                            for(int v = 0; v < value; v++) {
+                                int[] rowCol = path.get(k);
 
-                    // Check if the value is greater that ALL previous cells and less than the next cells
-                    if (j > 0) {
-                        int[] pcell = path.get(j - 1);
-                        if (options[pcell[0]][pcell[1]][value - 1] == 1) {
-                            changes.add(new int[] {pcell[0], pcell[1], value - 1});
-                            options[pcell[0]][pcell[1]][value - 1] = 0;
+                                if(options[rowCol[0]][rowCol[1]][v] == 1) {
+                                    changes.add(new int[] {rowCol[0], rowCol[1], v});
+                                }
+                                options[rowCol[0]][rowCol[1]][v] = 0;
+                            }
+                        }
+                        else if (k < j) {
+                            for(int v = value; v < options[0][0].length; v++) {
+                                int[] rowCol = path.get(k);
+
+                                if(options[rowCol[0]][rowCol[1]][v] == 1) {
+                                    changes.add(new int[] {rowCol[0], rowCol[1], v});
+                                }
+                                options[rowCol[0]][rowCol[1]][v] = 0;
+                            }
                         }
                     }
 
-                    if (j < path.size() - 1) {
-                        int[] ncell = path.get(j + 1);
-                        if (options[ncell[0]][ncell[1]][value - 1] == 1) {
-                            changes.add(new int[] {ncell[0], ncell[1], value - 1});
-                            options[ncell[0]][ncell[1]][value - 1] = 0;
-                        }
-                    }   
                 }
             }
         }

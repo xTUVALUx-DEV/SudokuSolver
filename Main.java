@@ -4,10 +4,12 @@ import java.io.IOException;
 import SudokuSolver.Boards.DefaultBoard;
 import SudokuSolver.Boards.SudokuBoard;
 import SudokuSolver.Boards.ThermoSudokuBoard;
+import SudokuSolver.BruteForceSolver.BruteForceSolver;
 import SudokuSolver.JsonReader.JsonMapComponent;
 import SudokuSolver.JsonReader.JsonReader;
 import SudokuSolver.SmartSolver.GenericSmartSolver;
 import SudokuSolver.SmartSolver.SmartSolverConfig;
+import SudokuSolver.SmartSolver.OptionBoards.ThermoOptionBoard;
 
 class Main {
 
@@ -21,6 +23,7 @@ class Main {
               
               boolean threading = true;
               boolean transposition = true;
+              boolean bruteForce = false;
 
               for (int i = 1; i < args.length; i++) {
                   if (args[i].equals("--no-threading")) {
@@ -32,8 +35,16 @@ class Main {
                   else if (args[i].equals("--thermo")) {
                       board = new ThermoSudokuBoard(json);
                   }
+                  else if (args[i].equals("--heizung")) {
+                      bruteForce = true;
+                  }
               }
-              
+              if (bruteForce) {
+                    BruteForceSolver solver = new BruteForceSolver();
+                    solver.solve(board);
+                    return;
+              }
+
               GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(
                 threading ? 1 : 0, 
                 transposition, 10));
@@ -53,14 +64,22 @@ class Main {
         return;
     }
 
-    System.out.println("Usage: java Main file.json [--no-threading] [--no-transposition]");
-    System.exit(0);
+    // System.out.println("Usage: java Main file.json [--no-threading] [--no-transposition] [--heizung]");
+    // System.exit(0);
 
-    JsonReader reader = new JsonReader(new File("test.json"));
+    JsonReader reader = new JsonReader(new File("thermo.json"));
     JsonMapComponent json = (JsonMapComponent) reader.readJson();
     
-    SudokuBoard board = new DefaultBoard(json);
+    ThermoSudokuBoard board = new ThermoSudokuBoard(json);
     
+    ThermoOptionBoard optionBoard = new ThermoOptionBoard(board);
+    System.out.println("["+optionBoard.getOptionsReadable(1, 1) + "]");
+    optionBoard.setValue(0, 1, 5);
+    System.out.println("["+optionBoard.getOptionsReadable(1, 1) + "]");
+
+    System.out.println("["+optionBoard.getOptionsReadable(0, 0) + "]");
+    System.exit(0);
+
     GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(1, true, 10));
 
     solver.solve(board);
