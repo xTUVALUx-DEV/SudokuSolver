@@ -51,23 +51,23 @@ public class ThermoOptionBoard extends DefaultOptionBoard {
                     for (int k = 0; k < path.size(); k++) {
                         if (k == j) { continue; }
                         if (k > j) {
-                            for(int v = 0; v < value; v++) {
+                            for(int v = 0; v < value-1; v++) {
                                 int[] rowCol = path.get(k);
 
                                 if(options[rowCol[0]][rowCol[1]][v] == 1) {
                                     changes.add(new int[] {rowCol[0], rowCol[1], v});
+                                    options[rowCol[0]][rowCol[1]][v] = 0;
                                 }
-                                options[rowCol[0]][rowCol[1]][v] = 0;
                             }
                         }
                         else if (k < j) {
-                            for(int v = value; v < options[0][0].length; v++) {
+                            for(int v = value+1; v <= options[0][0].length-1; v++) {
                                 int[] rowCol = path.get(k);
 
                                 if(options[rowCol[0]][rowCol[1]][v] == 1) {
                                     changes.add(new int[] {rowCol[0], rowCol[1], v});
+                                    options[rowCol[0]][rowCol[1]][v] = 0;
                                 }
-                                options[rowCol[0]][rowCol[1]][v] = 0;
                             }
                         }
                     }
@@ -75,7 +75,34 @@ public class ThermoOptionBoard extends DefaultOptionBoard {
                 }
             }
         }
+        // if (!validateBoard()) {
+        //     System.out.println("Move: " + row + " " + col + " " + value);
+        //     System.exit(0);
+        // }
         return new OptionBoardMove(changes);
+    }
+
+    
+    public boolean validateBoard() {
+        for (int i = 0; i < board.getPaths().size(); i++) {
+            LinkedList<int[]> path = board.getPaths().get(i);
+            
+            int[] lastCell = path.get(0);
+            int lastValue = board.getCell(lastCell[0], lastCell[1]);
+            for(int[] cell : path) {
+                if (cell[0] == lastCell[0] && cell[1] == lastCell[1]) {
+                    continue;
+                }
+                if (board.getCell(cell[0], cell[1]) != 0 && board.getCell(cell[0], cell[1]) < lastValue) {
+                    System.out.println("Invalid thermo path");
+                    System.out.println(board);
+                    return false;
+                }
+                lastValue = board.getCell(lastCell[0], lastCell[1]);
+                lastCell = cell;
+            }
+        }
+        return true;
     }
 
     @Override

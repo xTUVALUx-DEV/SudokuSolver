@@ -2,10 +2,11 @@
 
 ## Usage
 
-- java ./Main.java
+- java ./Main.java ./normal.json
 
 
 ## Features
 
-- Löst normale Sudoku's schnell
-- Löst Thermo Sudokus
+- Eigener JSON-Parser
+- Löst normale Sudoku's schnell (normal.json)
+- Löst thermo Sudoku's (thermo-easy.json)

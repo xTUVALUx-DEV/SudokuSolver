@@ -47,7 +47,7 @@ class Main {
 
               GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(
                 threading ? 1 : 0, 
-                transposition, 10));
+                transposition, 100));
           
               solver.solve(board);
           } catch (IOException e) {
@@ -64,9 +64,12 @@ class Main {
         return;
     }
 
-    // System.out.println("Usage: java Main file.json [--no-threading] [--no-transposition] [--heizung]");
-    // System.exit(0);
+    System.out.println("Usage: java Main file.json [--no-threading] [--no-transposition] [--heizung]");
+    System.exit(0);
 
+
+    // Debugging
+    
     JsonReader reader = new JsonReader(new File("thermo.json"));
     JsonMapComponent json = (JsonMapComponent) reader.readJson();
     
@@ -74,11 +77,10 @@ class Main {
     
     ThermoOptionBoard optionBoard = new ThermoOptionBoard(board);
     System.out.println("["+optionBoard.getOptionsReadable(1, 1) + "]");
-    optionBoard.setValue(0, 1, 5);
+    //optionBoard.setValue(0, 1, 5);
     System.out.println("["+optionBoard.getOptionsReadable(1, 1) + "]");
 
     System.out.println("["+optionBoard.getOptionsReadable(0, 0) + "]");
-    System.exit(0);
 
     GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(1, true, 10));
 
