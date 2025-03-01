@@ -47,7 +47,7 @@ class Main {
 
               GenericSmartSolver solver = new GenericSmartSolver(SmartSolverConfig.getCustomConfig(
                 threading ? 1 : 0, 
-                transposition, 100));
+                transposition, 10));
           
               solver.solve(board);
           } catch (IOException e) {
@@ -69,7 +69,7 @@ class Main {
 
 
     // Debugging
-    
+
     JsonReader reader = new JsonReader(new File("thermo.json"));
     JsonMapComponent json = (JsonMapComponent) reader.readJson();
     
